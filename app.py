@@ -1,17 +1,25 @@
 from flask import Flask
-from flasgger import Swagger
-from api.route.home import home_api
-
+from api.route.campaign import campaign_api
+from api.route.fan import fan_api
+from api.route.products import product_api
+from database import db
+from flask_migrate import Migrate
+import pandas as pd
+from dash_app import create_dash_app
+# Define the Flask app creation function
 def create_app():
     app = Flask(__name__)
-
-    app.config['SWAGGER'] = {
-        'title': 'Flask API Starter Kit',
-    }
-    swagger = Swagger(app)
-     ## Initialize Config
+    
+    # Initialize Config
     app.config.from_pyfile('config.py')
-    app.register_blueprint(home_api, url_prefix='/api')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + app.root_path + '/db/ifo.db'
+    db.init_app(app)
+    migrate = Migrate(app, db)
+
+    # Register blueprints
+    app.register_blueprint(campaign_api)
+    app.register_blueprint(fan_api)
+    app.register_blueprint(product_api)
 
     return app
 
@@ -24,6 +32,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     port = args.port
 
-    app = create_app()
+    flask_app = create_app()
+    dash_app = create_dash_app(flask_app)
+    # dash_app = hello_world_dash(flask_app)
 
-    app.run(host='0.0.0.0', port=port)
+    flask_app.run(host="0.0.0.0", port=port, debug=True)

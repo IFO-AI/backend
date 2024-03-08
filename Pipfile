@@ -5,12 +5,17 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flasgger = "*"
 flask-marshmallow = "*"
 apispec = "*"
 python-dotenv = "*"
+flasgger = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+marshmallow-sqlalchemy = "*"
+dash = "*"
+pandas = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10.12"
+python_version = "3.8"

@@ -32,3 +32,13 @@ The code is covered by tests, to run the tests please execute
 ```
 pipenv run python -m unittest
 ```
+
+## Migrations
+
+```
+flask db init
+flask db migrate -m "add comment here"
+
+flask db upgrade
+
+```
