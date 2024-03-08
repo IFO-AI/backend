@@ -12,7 +12,7 @@ def create_app():
     
     # Initialize Config
     app.config.from_pyfile('config.py')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + app.root_path + '/db/ifo.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ifo.db'
     db.init_app(app)
     migrate = Migrate(app, db)
 
