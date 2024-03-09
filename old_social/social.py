@@ -14,7 +14,7 @@ mastodon = Mastodon(client_id = 'BJCDDO2Wd0Xx_9IGfvwWWRuVEw57b2cx3fVt5mGod9k', c
 
 # mastodon = Mastodon(access_token = 'hSr_ylX-hXLaDYDipc07a06wGorDop4fzbRnkOwzFN0')
 data = mastodon.toot('Tooting from Python using #mastodonpy !')
-print(data)
+# print(data)
 # mastodon.timeline_home()
 
        

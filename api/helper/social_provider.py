@@ -24,17 +24,17 @@ def generate_mastodon_post(description, keyword, url):
 def create_mastodon_post(message):
     try:
         response = mastodon.toot(message)
+        return response
     except Exception as e:
-        logging.error("MASTODON: ", e)
-        print(e)
-        
-    return response
+        error_message = f"Error posting to Mastodon: {e}"
+        logging.error(error_message)
+        print(error_message)
+        return None
 
 def create_comment(post_id, comment):
     pass
 
 def mastodon_status(id):
     resp = mastodon.status(id)
-    print(resp)
     return resp
 

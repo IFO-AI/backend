@@ -19,8 +19,7 @@ def mastodon_stream_hashtag(hashtag):
         listener = HashTagListener()
         mastodon.stream_hashtag(hashtag,listener=listener)
     except Exception as e:  
-       print("Error")
-       print(e)
+       print("Error", e)
     
 
 mastodon_stream_hashtag("ifo")

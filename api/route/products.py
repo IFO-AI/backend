@@ -36,15 +36,20 @@ def create_product():
         for field in required_fields:
             if field not in data:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
-            
+        
+        product_url = data["product_url"]
+        existing_product = Product.query.filter_by(product_url=product_url).first()
+        if existing_product is not None:
+            return jsonify({'error': f'This product is already exist: {product_url}'}), 400
+
+
         product = Product(**data)
         generated_hashtag = generate_hashtags(project_title=product.product_title, project_description=product.description)
         epoch_time = int(time.time())
         unique_tag = f"{generated_hashtag}{BRAND_NAME.capitalize()}{epoch_time}"
         
         new_hashtags = f"#{BRAND_NAME} {generated_hashtag} {unique_tag}"
-        print("new_hashtags")
-        print(new_hashtags)
+
         generated_content = generate_campaign_post(product.product_title,product.description,product.product_url,CAMPAIGN_GOAL, new_hashtags)
         resp = create_mastodon_post(generated_content)
 
