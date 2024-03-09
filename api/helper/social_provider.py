@@ -21,10 +21,9 @@ def generate_mastodon_post(description, keyword, url):
     
     return mastodon_post
 
-def create_mastodon_post(message, hashtags, url, **kwargs):
+def create_mastodon_post(message):
     try:
-        mastodon_post = f"{message}\n\n🌐{url}\n\n{hashtags}"
-        response = mastodon.toot(mastodon_post)
+        response = mastodon.toot(message)
     except Exception as e:
         logging.error("MASTODON: ", e)
         print(e)

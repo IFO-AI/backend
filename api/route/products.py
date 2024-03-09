@@ -8,6 +8,11 @@ import json
 from pprint import pprint
 from werkzeug.datastructures import MultiDict
 from api.helper.social_provider import create_mastodon_post, mastodon_status
+from api.helper.open_ai import generate_hashtags, generate_campaign_post
+import time   
+ 
+BRAND_NAME = "ifo"
+CAMPAIGN_GOAL = "Help us Kickstart AI Startups with the Power of Community and Crypto"
 
 product_api = Blueprint('product_api', __name__, url_prefix='/api')
 
@@ -22,11 +27,9 @@ def get_product(id):
     product = Product.query.get_or_404(id)
     return jsonify(product.serialize())
 
-
 @product_api.route('/products', methods=['POST'])
 def create_product():
     try:
-        print()
         data = request.json
         # Validate that the required fields are present in the request
         required_fields = ['company_name', 'company_email', 'product_title', 'product_url', 'description']
@@ -35,9 +38,15 @@ def create_product():
                 return jsonify({'error': f'Missing required field: {field}'}), 400
             
         product = Product(**data)
+        generated_hashtag = generate_hashtags(project_title=product.product_title, project_description=product.description)
+        epoch_time = int(time.time())
+        unique_tag = f"{generated_hashtag}{BRAND_NAME.capitalize()}{epoch_time}"
         
-        hashtags = "#ifo"
-        resp = create_mastodon_post(product.description, hashtags, product.product_url )
+        new_hashtags = f"#{BRAND_NAME} {generated_hashtag} {unique_tag}"
+        print("new_hashtags")
+        print(new_hashtags)
+        generated_content = generate_campaign_post(product.product_title,product.description,product.product_url,CAMPAIGN_GOAL, new_hashtags)
+        resp = create_mastodon_post(generated_content)
 
         print(resp)
         

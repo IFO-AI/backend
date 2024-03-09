@@ -10,13 +10,13 @@ access_token = Config.get('MASTODON_ACCESS_TOKEN')
 
 
 mastodon = Mastodon(client_id = client_id, client_secret=client_secret, api_base_url=api_base_url, access_token=access_token)
-class MyListener(StreamListener):
+class HashTagListener(StreamListener):
     def on_update(self, status):
         print(f"New status from {status['account']['acct']}:\n{status['content']}")
         
 def mastodon_stream_hashtag(hashtag):
     try:
-        listener = MyListener()
+        listener = HashTagListener()
         mastodon.stream_hashtag(hashtag,listener=listener)
     except Exception as e:  
        print("Error")
