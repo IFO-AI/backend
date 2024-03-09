@@ -14,6 +14,16 @@ flask-migrate = "*"
 marshmallow-sqlalchemy = "*"
 dash = "*"
 pandas = "*"
+werkzeug = "*"
+tweepy = "*"
+"mastodon.py" = "*"
+openai = "*"
+transformers = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
+nltk = "*"
+flask-cors = "*"
 
 [dev-packages]
 

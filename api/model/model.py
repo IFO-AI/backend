@@ -5,13 +5,26 @@ class Product(db.Model):
     company_name = db.Column(db.String(100), nullable=False)
     company_email = db.Column(db.String(100), nullable=False)
     product_title = db.Column(db.String(100), nullable=False)
-    product_logo = db.Column(db.Text, nullable=False)
+    product_logo = db.Column(db.Text, nullable=True)
     product_url = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    twitter_username = db.Column(db.Text, nullable=False)
+    twitter_username = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<Product {self.id}>'
+    
+    def serialize(self):
+        """Serialize the Product object to a JSON format."""
+        return {
+            'id': self.id,
+            'company_name': self.company_name,
+            'company_email': self.company_email,
+            'product_title': self.product_title,
+            'product_logo': self.product_logo,
+            'product_url': self.product_url,
+            'description': self.description,
+            'twitter_username': self.twitter_username,
+        }
     
 class Fan(db.Model):
     id = db.Column(db.Integer, primary_key=True)

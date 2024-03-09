@@ -6,10 +6,13 @@ from database import db
 from flask_migrate import Migrate
 import pandas as pd
 from dash_app import create_dash_app
+from flask_cors import CORS
+
 # Define the Flask app creation function
 def create_app():
     app = Flask(__name__)
-    
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+
     # Initialize Config
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ifo.db'
