@@ -9,6 +9,11 @@ class Product(db.Model):
     product_url = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     twitter_username = db.Column(db.Text, nullable=True)
+    unique_tag = db.Column(db.Text, nullable=True)
+    common_tags = db.Column(db.Text, nullable=True)
+    platform = db.Column(db.Text, nullable=True)
+    post_id = db.Column(db.Text, nullable=True)
+    gen_description = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<Product {self.id}>'
@@ -48,5 +53,41 @@ class Campaign(db.Model):
     product_landing_page = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
 
+
     def __repr__(self):
         return f'<Campaign {self.id}>'
+    
+    
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer)
+    username = db.Column(db.String(255))
+    comment_id = db.Column(db.Integer)
+    content = db.Column(db.String(255))
+    full_content = db.Column(db.String(500))
+    parent_id = db.Column(db.Integer)
+    sentiment = db.Column(db.Text, nullable=True)
+    reply_message_id = db.Column(db.Integer)
+    reply_message = db.Column(db.Text, nullable=True)
+    
+    def __init__(self, account_id, username, comment_id, content, full_content, parent_id):
+        self.account_id = account_id
+        self.username = username
+        self.comment_id = comment_id
+        self.content = content
+        self.full_content = full_content
+        self.parent_id = parent_id
+        
+    def serialize(self):
+        return {
+            'id': self.id,
+            'account_id': self.account_id,
+            'username': self.username,
+            'comment_id': self.comment_id,
+            'content': self.content,
+            'full_content': self.full_content,
+            'parent_id': self.parent_id,
+            'sentiment': self.sentiment,
+            'reply_message_id': self.reply_message_id,
+            'reply_message': self.reply_message
+        }

@@ -24,6 +24,7 @@ torchvision = "*"
 torchaudio = "*"
 nltk = "*"
 flask-cors = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 

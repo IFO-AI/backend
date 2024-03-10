@@ -2,23 +2,24 @@ from http import HTTPStatus
 from flask import Blueprint, jsonify, request
 from flasgger import Swagger
 from api.schema.welcome import WelcomeSchema
-from api.model.model import Product
+from api.model.model import Product, Comment
 from database import db
 import json
 from pprint import pprint
 from werkzeug.datastructures import MultiDict
-from api.helper.social_provider import create_mastodon_post, mastodon_status
-from api.helper.open_ai import generate_hashtags, generate_campaign_post
+from api.helper.social_provider import create_mastodon_post, mastodon_status, create_mastodon_comment
+from api.helper.open_ai import generate_hashtags, generate_campaign_post, generate_comment_post
 import time   
  
 BRAND_NAME = "ifo"
 CAMPAIGN_GOAL = "Help us Kickstart AI Startups with the Power of Community and Crypto"
 
 product_api = Blueprint('product_api', __name__, url_prefix='/api')
+comment_api = Blueprint('comment_api', __name__, url_prefix='/api')
 
 @product_api.route('/products', methods=['GET'])
 def get_products():
-    resp = mastodon_status("112065853322040361")
+    # resp = mastodon_status("112065853322040361")
     products = Product.query.all()
     return jsonify([product.serialize() for product in products])
 
@@ -39,6 +40,8 @@ def create_product():
         
         product_url = data["product_url"]
         existing_product = Product.query.filter_by(product_url=product_url).first()
+        # pprint(existing_product.unique_tag)
+        # pprint(existing_product.post_id)
         if existing_product is not None:
             return jsonify({'error': f'This product is already exist: {product_url}'}), 400
 
@@ -53,12 +56,17 @@ def create_product():
         generated_content = generate_campaign_post(product.product_title,product.description,product.product_url,CAMPAIGN_GOAL, new_hashtags)
         resp = create_mastodon_post(generated_content)
 
-        print(resp)
+        # print(resp)
+        product.common_tags = new_hashtags
+        product.unique_tag = unique_tag
+        product.post_id = resp.id
+        product.platform = "mastodon"
+        product.gen_description = generated_content
         
         db.session.add(product)
         db.session.commit()
 
-        return jsonify({'message': 'Product created successfully', 'id': product.id}), 201
+        return jsonify({'message': 'Product created successfully', 'id': product.id, 'post_id':product.post_id }), 201
 
     except Exception as e:
         # Log the error for debugging purposes
@@ -66,6 +74,53 @@ def create_product():
 
         return jsonify({'error': 'Internal Server Error'}), 500
 
+
+
+@comment_api.route('/comment', methods=['POST'])
+def process_comment():
+    try:
+        data = request.json  
+        print("data")
+        print(data)
+        parent_post_id = data["parent_id"]
+        if parent_post_id is not None:
+            product = Product.query.filter_by(post_id=parent_post_id).first()
+            if product is not None:
+                print(product)
+                comment = Comment(**data)
+                comment_post, sentiment = generate_comment_post(product.gen_description, comment.comment_id)
+                comment_post = f"@{comment.username} {comment_post}"
+                resp = create_mastodon_comment(comment_post,comment.comment_id)
+                if resp is None:
+                    return jsonify({'error': f'Mastodon post failed'}), 400
+
+                comment.reply_message = comment_post
+                comment.reply_message_id = resp.id
+                comment.sentiment = sentiment
+                print("comment")
+                print(comment)
+                db.session.add(comment)
+                db.session.commit()
+
+                return jsonify({'message': 'Comment created successfully', 'id': comment.id, "comment_id":comment.comment_id}), 201
+            else:
+                return jsonify({'error': f'Product not found'}), 400
+
+   
+        return jsonify({'error': f'This is not the comment'}), 400
+
+    except Exception as e:
+        # Log the error for debugging purposes
+        print(f"Error creating product: {str(e)}")
+
+        return jsonify({'error': 'Internal Server Error'}), 500
+    
+@comment_api.route('/comments', methods=['GET'])
+def get_comments():
+    # resp = mastodon_status("112065853322040361")
+    comments = Comment.query.all()
+    print(comments)
+    return jsonify([comment.serialize() for comment in comments])
 
 ## If we need form data with file then the api will change using below one
 # @product_api.route('/products/form', methods=['POST'])

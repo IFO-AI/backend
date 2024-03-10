@@ -1,7 +1,7 @@
 from flask import Flask
 from api.route.campaign import campaign_api
 from api.route.fan import fan_api
-from api.route.products import product_api
+from api.route.products import product_api, comment_api
 from database import db
 from flask_migrate import Migrate
 import pandas as pd
@@ -23,6 +23,7 @@ def create_app():
     app.register_blueprint(campaign_api)
     app.register_blueprint(fan_api)
     app.register_blueprint(product_api)
+    app.register_blueprint(comment_api)
 
     return app
 

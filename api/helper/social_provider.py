@@ -28,11 +28,16 @@ def create_mastodon_post(message):
     except Exception as e:
         error_message = f"Error posting to Mastodon: {e}"
         logging.error(error_message)
-        print(error_message)
         return None
 
-def create_comment(post_id, comment):
-    pass
+def create_mastodon_comment(reply_content, comment_id):
+    try:
+        response =  mastodon.status_post(reply_content, in_reply_to_id=comment_id, visibility='direct')
+        return response
+    except Exception as e:
+        error_message = f"Error commenting to Mastodon: {e}"
+        logging.error(error_message)
+        return None
 
 def mastodon_status(id):
     resp = mastodon.status(id)
