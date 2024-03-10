@@ -47,7 +47,8 @@ class UserListener(StreamListener):
         print("parent_id")
         print(comment["parent_id"])
         if comment is not None and comment["parent_id"]:
-            response = requests.post(api_endpoint, json=comment)
+            headers = {"Content-Type": "application/json"}  # Set the content type to JSON
+            response = requests.post(api_endpoint, json=comment, headers=headers)
             print(response.text)
 
 def mastodon_stream_user():

@@ -11,11 +11,13 @@ from flask_cors import CORS
 # Define the Flask app creation function
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app)
 
     # Initialize Config
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ifo.db'
+    # app.config['SQLALCHEMY_POOL_SIZE'] = 20
+    # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
     db.init_app(app)
     migrate = Migrate(app, db)
 
@@ -40,4 +42,4 @@ if __name__ == '__main__':
     dash_app = create_dash_app(flask_app)
     # dash_app = hello_world_dash(flask_app)
 
-    flask_app.run(host="127.0.0.1", port=port, debug=True)
+    flask_app.run(host="0.0.0.0", port=port, debug=True)

@@ -26,7 +26,7 @@ def generate_hashtags(project_title, project_description):
     
     return generated_hashtags.content
 
-def generate_campaign_post(project_title, project_description, product_url, campaign_goal, hashtags):
+def generate_campaign_post(project_title, project_description, product_url, campaign_goal, hashtags,tel_group_invite_link):
     prompt = f"Generate a social campaign post within 400 character for the project:\n\nTitle: {project_title}\n\nDescription: {project_description}\n\nCampaign Goal: {campaign_goal}\n\n"
 
     completion = client.chat.completions.create(
@@ -40,7 +40,7 @@ def generate_campaign_post(project_title, project_description, product_url, camp
     generated_content = completion.choices[0].message.content
     data = generated_content.split("#",1)
     selected_item = random.choice(items)
-    message = data[0]+ "\n"+ selected_item + " "+product_url + "\n"+ hashtags
+    message = data[0]+ "\n"+ selected_item + " "+product_url + "\n"+"Let's join 💡"+project_title +"💡 telegram community for future update "+tel_group_invite_link +"\n" + hashtags
     new_tags = "#" + data[1] # Will be used later if required
     return message
 

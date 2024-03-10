@@ -4,12 +4,15 @@ from flasgger import Swagger
 from api.schema.welcome import WelcomeSchema
 from api.model.model import Product, Comment
 from database import db
+import asyncio
+
 import json
 from pprint import pprint
 from werkzeug.datastructures import MultiDict
 from api.helper.social_provider import create_mastodon_post, mastodon_status, create_mastodon_comment
 from api.helper.open_ai import generate_hashtags, generate_campaign_post, generate_comment_post
-import time   
+import time  
+from api.helper.tel import create_supergroup_and_invite_link 
  
 BRAND_NAME = "ifo"
 CAMPAIGN_GOAL = "Help us Kickstart AI Startups with the Power of Community and Crypto"
@@ -52,8 +55,11 @@ def create_product():
         unique_tag = f"{generated_hashtag}{BRAND_NAME.capitalize()}{epoch_time}"
         
         new_hashtags = f"#{BRAND_NAME} {generated_hashtag} {unique_tag}"
-
-        generated_content = generate_campaign_post(product.product_title,product.description,product.product_url,CAMPAIGN_GOAL, new_hashtags)
+        # result = asyncio.run(create_telegram_group(title, desc))
+        # print(result)
+        tel_group_invite_link = asyncio.run(create_supergroup_and_invite_link(product.product_title, product.description))
+        print(tel_group_invite_link)
+        generated_content = generate_campaign_post(product.product_title,product.description,product.product_url,CAMPAIGN_GOAL, new_hashtags, tel_group_invite_link)
         resp = create_mastodon_post(generated_content)
 
         # print(resp)
