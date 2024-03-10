@@ -25,6 +25,8 @@ torchaudio = "*"
 nltk = "*"
 flask-cors = "*"
 beautifulsoup4 = "*"
+telethon = "1.33"
+aiohttp = "*"
 
 [dev-packages]
 

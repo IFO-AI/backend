@@ -40,4 +40,4 @@ if __name__ == '__main__':
     dash_app = create_dash_app(flask_app)
     # dash_app = hello_world_dash(flask_app)
 
-    flask_app.run(host="0.0.0.0", port=port, debug=True)
+    flask_app.run(host="127.0.0.1", port=port, debug=True)

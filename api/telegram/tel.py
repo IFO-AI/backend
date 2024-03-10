@@ -68,7 +68,7 @@ async def create_and_send_token(destination_wallet, secret_key_base58):
                 return None
 
 
-async def create_supergroup_and_invite_link(client, title, description):
+async def create_supergroup_and_invite_link(title, description):
     # Connect to the client
     await client.connect()
     
@@ -107,67 +107,70 @@ async def create_supergroup_and_invite_link(client, title, description):
 
     return channel.id, invite_link_result.link, token_creation_response['mint']
 
+client = TelegramClient('ifo_session_name', api_id, api_hash) 
 
 async def main():
     title = "IFO Project"
     description = "An IFO Project for the Solana Hackathon."
-    async with TelegramClient('session_name', api_id, api_hash) as client:
-        # Create the supergroup and get its invite link
-        res = await create_supergroup_and_invite_link(client, title, description)
-        mint = res[2]
-        print(f"mint: {mint}")
 
-        # Setup listener for new members joining
-        @client.on(events.ChatAction())
-        async def handler(event):
-            print(event)
-            # Check if the event is someone joining
-            if event.user_joined or event.user_added:
-                new_user = await event.get_user()
-                username = new_user.username if new_user.username else new_user.first_name
-                print(f"{username} has joined the group!")
+    me = await client.get_me()
+    print(me)  # Print your Telegram user information
 
-                # Create keypair for the new user
-                keypair = await create_keypair()
-                print(f"Keypair created for {username}: {keypair['publicKey']}")
+    # Function to create supergroup and get invite link
+    channel_id, invite_link, mint = await create_supergroup_and_invite_link(title, description)
+    print(f"Channel ID: {channel_id}, Invite Link: {invite_link}, Mint: {mint}")
 
-                # SEND AN API HIT TO SEND TOKENS TO THE USER
-                await create_ata(keypair['publicKey'], secret_key_base58, mint)
-                await create_ata(public_key, secret_key_base58, mint)
+    # Listener for new members joining
+    @client.on(events.ChatAction)
+    async def handler(event):
+        print("event")
+        print(event)
+        if event.user_joined:  # Check if user joined specifically
+            new_user = await event.get_user()
+            username = new_user.username or new_user.first_name
+            print(f"{username} has joined the group!")
 
-                tx = await send_tokens(keypair['publicKey'], secret_key_base58, mint)
-                print(f"Tokens sent to {username}: Transaction ID {tx}")
+            # Implement your logic for creating keypair and sending tokens to user
+            # (replace with actual Solana interaction functions)
+            keypair = await create_keypair()
+            print(f"Keypair created for {username}: {keypair['publicKey']}")
 
-                # Restricting the new user's ability to send messages for 30 seconds
-                rights = ChatBannedRights(
-                    until_date=datetime.now() + timedelta(seconds=30),  # Restriction duration of 30 seconds
-                    send_messages=True,
-                    view_messages=True
-                )
+            await create_ata(keypair['publicKey'], secret_key_base58, mint)
+            await create_ata(public_key, secret_key_base58, mint)
 
-                await client(EditBannedRequest(
-                    channel=event.chat_id,
-                    participant=new_user.id,
-                    banned_rights=rights
-                ))
-                print(f"Restrictions applied to {username} for 30 seconds.")
+            tx = await send_tokens(keypair['publicKey'], secret_key_base58, mint)
+            print(f"Tokens sent to {username}: Transaction ID {tx}")
 
-                # Send a welcome message to the new user
-                welcome_message = f"""
-                    Welcome to the group, {username}!
+            # Restrict new user's ability to send messages for 30 seconds
+            rights = ChatBannedRights(
+                until_date=datetime.now() + timedelta(seconds=30),
+                send_messages=True,
+            )
 
-                    100 tokens have been sent to your wallet on Solana.
-                    Here is your public key: {keypair['publicKey']}
-                    Here is your private key: {keypair['privateKey']}
+            await client(EditBannedRequest(
+                channel=event.chat_id,
+                participant=new_user.id,
+                banned_rights=rights
+            ))
+            print(f"Restrictions applied to {username} for 30 seconds.")
 
-                    Please keep your private key safe and do not share it with anyone.
-                """
-                await client.send_message(new_user.id, welcome_message)
-                print(f"Sent welcome message to {username}.")
+            # Welcome message with placeholders for actual key information
+            welcome_message = f"""
+                Welcome to the group, {username}!
 
-        print("Listening for new members...")
-        await client.run_until_disconnected()
+                100 tokens have been sent to your wallet on Solana.
+                Here is your public key: {keypair['publicKey']}
 
+                Please keep your private key safe and do not share it with anyone.
+            """
+            await client.send_message(new_user.id, welcome_message)
+            print(f"Sent welcome message to {username}.")
 
-import asyncio
-asyncio.run(main())
+    print("Listening for new members...")
+    await client.run_until_disconnected()
+
+# import asyncio
+# asyncio.run(main())
+# # Run the main function with your Telegram client
+with client:
+    client.loop.run_until_complete(main())
