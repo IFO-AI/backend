@@ -48,7 +48,7 @@ class UserListener(StreamListener):
         print(comment["parent_id"])
         if comment is not None and comment["parent_id"]:
             response = requests.post(api_endpoint, json=comment)
-            print(response)
+            print(response.text)
 
 def mastodon_stream_user():
     try:

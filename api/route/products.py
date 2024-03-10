@@ -79,40 +79,44 @@ def create_product():
 @comment_api.route('/comment', methods=['POST'])
 def process_comment():
     try:
-        data = request.json  
-        print("data")
-        print(data)
-        parent_post_id = data["parent_id"]
+        data = request.json
+
+        if not data:
+            return jsonify({'error': 'Empty request body or invalid JSON'}), 400
+
+        parent_post_id = data.get("parent_id")
+
         if parent_post_id is not None:
             product = Product.query.filter_by(post_id=parent_post_id).first()
+
             if product is not None:
-                print(product)
                 comment = Comment(**data)
                 comment_post, sentiment = generate_comment_post(product.gen_description, comment.comment_id)
                 comment_post = f"@{comment.username} {comment_post}"
-                resp = create_mastodon_comment(comment_post,comment.comment_id)
+
+                resp = create_mastodon_comment(comment_post, comment.comment_id)
+
                 if resp is None:
-                    return jsonify({'error': f'Mastodon post failed'}), 400
+                    return jsonify({'error': 'Mastodon post failed'}), 400
 
                 comment.reply_message = comment_post
                 comment.reply_message_id = resp.id
                 comment.sentiment = sentiment
-                print("comment")
+                print("comment reply")
                 print(comment)
                 db.session.add(comment)
-                db.session.commit()
-
-                return jsonify({'message': 'Comment created successfully', 'id': comment.id, "comment_id":comment.comment_id}), 201
+                status = db.session.commit()
+                print(status)
+                return jsonify({'message': 'Comment created successfully', 'id': comment.id, "comment_id": comment.comment_id}), 201
             else:
-                return jsonify({'error': f'Product not found'}), 400
+                return jsonify({'error': 'Product not found'}), 400
 
-   
-        return jsonify({'error': f'This is not the comment'}), 400
+        return jsonify({'error': 'This is not the comment'}), 400
 
     except Exception as e:
         # Log the error for debugging purposes
+        print(e)
         print(f"Error creating product: {str(e)}")
-
         return jsonify({'error': 'Internal Server Error'}), 500
     
 @comment_api.route('/comments', methods=['GET'])
