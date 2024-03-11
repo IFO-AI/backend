@@ -3,10 +3,10 @@ from database import db
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
-    company_email = db.Column(db.String(100), nullable=False)
-    product_title = db.Column(db.String(100), nullable=False)
+    company_email = db.Column(db.String(200), nullable=False)
+    product_title = db.Column(db.String(500), nullable=False)
     product_logo = db.Column(db.Text, nullable=True)
-    product_url = db.Column(db.String(100), nullable=False)
+    product_url = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     twitter_username = db.Column(db.Text, nullable=True)
     unique_tag = db.Column(db.Text, nullable=True)
@@ -14,7 +14,7 @@ class Product(db.Model):
     platform = db.Column(db.Text, nullable=True)
     post_id = db.Column(db.Text, nullable=True)
     gen_description = db.Column(db.Text, nullable=True)
-
+    tel_group = db.Column(db.String(200), nullable=True)
     def __repr__(self):
         return f'<Product {self.id}>'
     
@@ -63,8 +63,8 @@ class Comment(db.Model):
     account_id = db.Column(db.Integer)
     username = db.Column(db.String(255))
     comment_id = db.Column(db.Integer)
-    content = db.Column(db.String(255))
-    full_content = db.Column(db.String(500))
+    content = db.Column(db.Text)
+    full_content = db.Column(db.Text)
     parent_id = db.Column(db.Integer)
     sentiment = db.Column(db.Text, nullable=True)
     reply_message_id = db.Column(db.Integer)

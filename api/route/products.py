@@ -68,6 +68,7 @@ def create_product():
         product.post_id = resp.id
         product.platform = "mastodon"
         product.gen_description = generated_content
+        product.tel_group = tel_group_invite_link
         
         db.session.add(product)
         db.session.commit()
@@ -110,10 +111,14 @@ def process_comment():
                 comment.sentiment = sentiment
                 print("comment reply")
                 print(comment)
-                db.session.add(comment)
-                status = db.session.commit()
-                print(status)
-                return jsonify({'message': 'Comment created successfully', 'id': comment.id, "comment_id": comment.comment_id}), 201
+                try:
+                    db.session.add(comment)
+                    db.session.commit()
+                    return jsonify({'message': 'Comment created successfully', 'id': comment.id, "comment_id": comment.comment_id}), 201
+                except Exception as commit_error:
+                    print(f"Error committing comment to the database: {str(commit_error)}")
+                    db.session.rollback()  # Rollback the transaction in case of an error
+                    return jsonify({'error': 'Internal Server Error'}), 500
             else:
                 return jsonify({'error': 'Product not found'}), 400
 
@@ -122,7 +127,7 @@ def process_comment():
     except Exception as e:
         # Log the error for debugging purposes
         print(e)
-        print(f"Error creating product: {str(e)}")
+        print(f"Error creating comment: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
     
 @comment_api.route('/comments', methods=['GET'])

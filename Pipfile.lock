@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "053ce8eec397cf31850affa6d6cec9c955de879fe3c359e3a152cc279ffab938"
+            "sha256": "091347ef3c2c3d9b4cb586e7ca8af11ce0c92dad8cdac98e1efef012b2a16d8b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -921,7 +921,7 @@
                 "sha256:f870204a840a60da0b12273ef34f7051e98c3b5961b61b0c2c1be6dfd64fbcd3",
                 "sha256:ffa75af20b44f8dba823498024771d5ac50620e6915abac414251bd971b4529f"
             ],
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version < '3.11'",
             "version": "==1.26.4"
         },
         "nvidia-cublas-cu12": {
@@ -1813,11 +1813,11 @@
         },
         "telethon": {
             "hashes": [
-                "sha256:9e515bac70fc5bc58cbace0e193a42bb42511f16bb7a319707f860476e8ce164"
+                "sha256:55290809a30081fa0bb5052abb7547cbb25d7fbca94f32f13c147504d521804f"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.5'",
-            "version": "==1.33.0"
+            "version": "==1.34.0"
         },
         "tenacity": {
             "hashes": [
